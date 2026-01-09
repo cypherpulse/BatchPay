@@ -11,17 +11,21 @@
   - [Overview](#overview)
   - [Features](#features)
   - [Architecture](#architecture)
-    - [Smart Contract (`solidityContract/`)](#smart-contract-soliditycontract)
-    - [Frontend](#frontend)
+    - [System Overview](#system-overview)
+    - [Batch Payment Flow](#batch-payment-flow)
+    - [Smart Contract Architecture](#smart-contract-architecture)
+    - [Frontend Component Structure](#frontend-component-structure)
+    - [Deployment Workflow](#deployment-workflow)
+    - [User Journey](#user-journey)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Usage](#usage)
     - [Smart Contract Development](#smart-contract-development)
     - [Frontend Development](#frontend-development)
   - [Smart Contract Details](#smart-contract-details)
-    - [BaseBatchPay Contract](#basebatchpay-contract)
-    - [Security Considerations](#security-considerations)
-  - [Testing](#testing)
+    - [Batch Payment State Flow](#batch-payment-state-flow)
+    - [Gas Optimization Strategy](#gas-optimization-strategy)
+    - [Security Audit Checklist](#security-audit-checklist)
   - [Deployment](#deployment)
     - [Testnet Deployment](#testnet-deployment)
     - [Mainnet Deployment](#mainnet-deployment)
@@ -53,25 +57,175 @@ The project is built using Foundry for smart contract development and deployment
 
 ## Architecture
 
+### System Overview
 ```mermaid
-graph TD
-    A[User] --> B[Frontend Interface]
-    B --> C[Web3 Provider]
-    C --> D[Base Network]
-    D --> E[BaseBatchPay Smart Contract]
-    E --> F[Batch Payment Logic]
-    F --> G[Payment Recipients]
+graph TB
+    subgraph "User Layer"
+        A[Web Browser]
+        B[Mobile Wallet]
+    end
+
+    subgraph "Frontend Layer"
+        C[React App]
+        D[ConnectKit]
+        E[Wagmi Provider]
+    end
+
+    subgraph "Blockchain Layer"
+        F[Base Network]
+        G[BaseBatchPay Contract]
+    end
+
+    subgraph "External Services"
+        H[WalletConnect]
+        I[Infura/Alchemy RPC]
+    end
+
+    A --> C
+    B --> H
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    H --> E
+    E --> I
 ```
 
-### Smart Contract (`solidityContract/`)
-- `BaseBatchPay.sol`: Main contract implementing batch payment functionality
-- Deployment scripts for testnet (`BaseBatchPayTestnet.s.sol`) and mainnet (`BaseBatchPayMainnet.s.sol`)
-- Test suite (`BatchPay.t.sol`) for comprehensive contract testing
+### Batch Payment Flow
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant W as Wallet
+    participant C as Contract
+    participant B as Blockchain
 
-### Frontend
-- Web interface for interacting with the BatchPay contract
-- Integration with Web3 providers for blockchain connectivity
-- User dashboard for managing batch payments
+    U->>F: Upload CSV or Add Recipients Manually
+    F->>F: Parse and Validate Data
+    F->>U: Show Preview & Total Amount
+    U->>F: Confirm Batch Payment
+    F->>W: Request Transaction Signature
+    W->>U: Show Transaction Details
+    U->>W: Approve Transaction
+    W->>F: Return Signed Transaction
+    F->>B: Submit Batch Transaction
+    B->>C: Execute batchPay Function
+    C->>C: Process Each Payment
+    C->>B: Emit Payment Events
+    B->>F: Transaction Confirmation
+    F->>U: Show Success Message
+```
+
+### Smart Contract Architecture
+```mermaid
+classDiagram
+    class BaseBatchPay {
+        +address owner
+        +uint256 protocolFee
+        +mapping(address => Payment[]) paymentHistory
+
+        +batchPay(address[], uint256[])
+        +getPaymentHistory(address)
+        +withdrawFunds()
+        +addEmployee(address)
+        +removeEmployee(address)
+        -_validateRecipients(address[], uint256[])
+    }
+
+    class Payment {
+        +address recipient
+        +uint256 amount
+        +uint256 timestamp
+        +bytes32 txHash
+    }
+
+    class Ownable {
+        +address owner
+        +transferOwnership(address)
+        +renounceOwnership()
+    }
+
+    class ReentrancyGuard {
+        -uint256 _status
+        +nonReentrant()
+    }
+
+    BaseBatchPay --|> Ownable
+    BaseBatchPay --|> ReentrancyGuard
+    BaseBatchPay --> Payment
+```
+
+### Frontend Component Structure
+```mermaid
+graph TD
+    A[App.tsx] --> B[Router]
+    B --> C[Home Page]
+    B --> D[Create Page]
+    B --> E[History Page]
+    B --> F[About Page]
+
+    C --> G[Hero Component]
+    C --> H[Features Component]
+
+    D --> I[RecipientInput]
+    I --> J[CSVUpload]
+    I --> K[ManualInput]
+    D --> L[PaymentPreview]
+    D --> M[TransactionStatus]
+
+    J --> N[CSV Parser]
+    K --> O[Recipient Form]
+
+    E --> P[Payment History List]
+    E --> Q[Transaction Details]
+
+    F --> R[About Content]
+    F --> S[Technical Details]
+```
+
+### Deployment Workflow
+```mermaid
+flowchart TD
+    A[Local Development] --> B[Write Tests]
+    B --> C[Run Tests]
+    C --> D{Tests Pass?}
+    D -->|No| E[Fix Issues]
+    E --> C
+    D -->|Yes| F[Compile Contract]
+    F --> G[Deploy to Testnet]
+    G --> H[Verify Contract]
+    H --> I[Frontend Integration]
+    I --> J[End-to-End Testing]
+    J --> K{Ready for Mainnet?}
+    K -->|No| L[Iterate & Improve]
+    L --> I
+    K -->|Yes| M[Deploy to Mainnet]
+    M --> N[Final Verification]
+    N --> O[Production Ready]
+```
+
+### User Journey
+```mermaid
+journey
+    title BatchPay User Experience
+    section Discovery
+      User discovers BatchPay: 5: User
+      Reads documentation: 4: User
+    section Setup
+      Connects wallet: 5: User
+      Switches to Base network: 4: User
+    section Payment Creation
+      Chooses input method: 5: User
+      Uploads CSV or adds manually: 4: User
+      Reviews payment details: 5: User
+    section Execution
+      Approves transaction: 5: User
+      Waits for confirmation: 3: User
+      Receives success feedback: 5: User
+    section Management
+      Views payment history: 4: User
+      Tracks transaction status: 4: User
+```
 
 ## Prerequisites
 
@@ -159,34 +313,71 @@ Before setting up the project, ensure you have the following installed:
 
 ## Smart Contract Details
 
-### BaseBatchPay Contract
+### Batch Payment State Flow
+```mermaid
+stateDiagram-v2
+    [*] --> InputValidation
+    InputValidation --> RecipientsValidated: Valid data
+    InputValidation --> Error: Invalid data
+    Error --> InputValidation: Fix issues
 
-The core contract provides the following functions:
+    RecipientsValidated --> WalletConnection: Proceed
+    WalletConnection --> NetworkCheck: Connected
+    WalletConnection --> Error: No wallet
 
-- `batchPay(address[] calldata recipients, uint256[] calldata amounts)`: Execute batch payments
-- `getPaymentHistory(address user)`: Retrieve payment history for a user
-- `withdrawFunds()`: Allow contract owner to withdraw accumulated fees
+    NetworkCheck --> BaseNetwork: On Base
+    NetworkCheck --> NetworkSwitch: Wrong network
+    NetworkSwitch --> BaseNetwork: Switched
 
-### Security Considerations
+    BaseNetwork --> TransactionApproval: Ready
+    TransactionApproval --> Signing: Approved
+    TransactionApproval --> Cancelled: Rejected
 
-- Uses OpenZeppelin contracts for secure implementations
-- Includes reentrancy guards and access controls
-- Comprehensive test coverage to prevent vulnerabilities
+    Signing --> Broadcasting: Signed
+    Broadcasting --> Confirming: Submitted
+    Confirming --> Success: Confirmed
+    Confirming --> Failed: Error
 
-## Testing
-
-The project includes a comprehensive test suite:
-
-```bash
-cd solidityContract
-forge test
+    Success --> [*]: Complete
+    Failed --> Retry: Try again
+    Retry --> TransactionApproval
+    Cancelled --> [*]: Aborted
 ```
 
-Tests cover:
-- Successful batch payment execution
-- Gas usage optimization
-- Error handling for invalid inputs
-- Access control verification
+### Gas Optimization Strategy
+```mermaid
+pie title Gas Savings with Batch Payments
+    "Individual Transactions" : 100
+    "Batch Transaction Cost" : 25
+    "Protocol Fee (0.5%)" : 2
+    "Net Savings" : 73
+```
+
+### Security Audit Checklist
+```mermaid
+graph TD
+    A[Security Audit] --> B[Contract Logic]
+    A --> C[Access Controls]
+    A --> D[Input Validation]
+    A --> E[Reentrancy Protection]
+    A --> F[Overflow Protection]
+
+    B --> B1[Business Logic Correct]
+    B --> B2[Payment Distribution Accurate]
+
+    C --> C1[Owner Functions Protected]
+    C --> C2[Employee Management Secure]
+
+    D --> D1[Address Validation]
+    D --> D2[Amount Validation]
+    D --> D3[Array Length Checks]
+
+    E --> E1[ReentrancyGuard Implemented]
+    E --> E2[State Changes Before Transfers]
+
+    F --> F1[SafeMath Usage]
+    F --> F2[Uint256 Overflow Checks]
+```
 
 ## Deployment
 
