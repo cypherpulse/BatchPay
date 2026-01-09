@@ -291,4 +291,9 @@ node_modules/
 ehthumbs.db
 Thumbs.db
 
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
 *.ps1
