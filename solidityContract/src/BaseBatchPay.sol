@@ -103,11 +103,17 @@ contract BaseBatchPay is Ownable, ReentrancyGuard {
         );
         require(recipients.length > 0 && recipients.length <= 100, "Invalid batch size");
 
-        // Check for duplicates and validations
+        // Check for duplicates and validations, and add employees if needed
         for (uint256 i = 0; i < recipients.length; i++) {
             require(recipients[i] != address(0), "Invalid recipient");
             require(amounts[i] > 0, "Amount must be positive");
-            require(employees[msg.sender][recipients[i]], "Recipient not an employee");
+            
+            // Automatically add recipient as employee if not already added
+            if (!employees[msg.sender][recipients[i]]) {
+                employees[msg.sender][recipients[i]] = true;
+                emit EmployeeAdded(msg.sender, recipients[i]);
+            }
+            
             for (uint256 j = i + 1; j < recipients.length; j++) {
                 require(recipients[i] != recipients[j], "Duplicate recipient");
             }
