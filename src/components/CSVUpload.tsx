@@ -144,18 +144,18 @@ export function CSVUpload({ onParsed, onClear, hasData }: CSVUploadProps) {
                   
                   {isLoading ? (
                     <div className="flex flex-col items-center">
-                      <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                      <p className="text-foreground">Parsing CSV...</p>
+                      <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent sm:h-12 sm:w-12" />
+                      <p className="text-foreground text-sm sm:text-base">Parsing CSV...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center">
-                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent">
-                        <Upload className="h-8 w-8 text-primary" />
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent sm:h-16 sm:w-16">
+                        <Upload className="h-6 w-6 text-primary sm:h-8 sm:w-8" />
                       </div>
-                      <p className="mb-2 text-lg font-medium text-foreground">
+                      <p className="mb-2 text-base font-medium text-foreground sm:text-lg">
                         Drop your CSV file here
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground sm:text-sm">
                         or click to browse
                       </p>
                     </div>

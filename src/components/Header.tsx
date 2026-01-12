@@ -1,10 +1,12 @@
 import { ConnectKitButton } from 'connectkit'
-import { Wallet } from 'lucide-react';
+import { Wallet, Menu, X } from 'lucide-react';
 import { NetworkSwitcher } from './NetworkSwitcher';
 import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 
 export function Header() {
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { path: '/', label: 'Home' },
@@ -14,24 +16,25 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-            <Wallet className="h-5 w-5 text-primary-foreground" />
+        <Link to="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary sm:h-9 sm:w-9">
+            <Wallet className="h-4 w-4 text-primary-foreground sm:h-5 sm:w-5" />
           </div>
-          <span className="text-xl font-bold text-foreground">BatchPay</span>
+          <span className="text-lg font-bold text-foreground sm:text-xl">BatchPay</span>
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors hover:text-foreground ${
                 location.pathname === item.path
                   ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground'
               }`}
             >
               {item.label}
@@ -46,16 +49,76 @@ export function Header() {
               return (
                 <button
                   onClick={show}
-                  className="btn-primary flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
+                  className="btn-primary hidden sm:flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold md:px-4 md:py-2.5"
                 >
                   <Wallet className="h-4 w-4" />
-                  {isConnected ? (ensName ?? truncatedAddress) : "Connect Wallet"}
+                  <span className="hidden lg:inline">
+                    {isConnected ? (ensName ?? truncatedAddress) : "Connect Wallet"}
+                  </span>
+                  <span className="lg:hidden">
+                    {isConnected ? "Connected" : "Connect"}
+                  </span>
                 </button>
               );
             }}
           </ConnectKitButton.Custom>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-lg">
+          <nav className="container py-4">
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                    location.pathname === item.path
+                      ? 'bg-accent text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="mt-2 pt-2 border-t border-border">
+                <ConnectKitButton.Custom>
+                  {({ isConnected, show, truncatedAddress, ensName }) => {
+                    return (
+                      <button
+                        onClick={() => {
+                          show();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full btn-primary flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold"
+                      >
+                        <Wallet className="h-4 w-4" />
+                        {isConnected ? (ensName ?? truncatedAddress) : "Connect Wallet"}
+                      </button>
+                    );
+                  }}
+                </ConnectKitButton.Custom>
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

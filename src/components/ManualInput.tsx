@@ -92,11 +92,11 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
           </div>
 
           <div className="card-base mb-6">
-            <h3 className="mb-4 text-lg font-semibold text-foreground">Add New Recipient</h3>
+            <h3 className="mb-4 text-base font-semibold text-foreground sm:text-lg">Add New Recipient</h3>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="address" className="flex items-center gap-2">
+            <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
+              <div className="space-y-2 sm:col-span-3 md:col-span-1">
+                <Label htmlFor="address" className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />
                   Ethereum Address
                 </Label>
@@ -106,23 +106,24 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
                   value={newRecipient.address}
                   onChange={(e) => setNewRecipient(prev => ({ ...prev, address: e.target.value }))}
                   onKeyPress={handleKeyPress}
-                  className="font-mono"
+                  className="font-mono text-sm sm:text-base"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Name (Optional)</Label>
+              <div className="space-y-2 sm:col-span-3 md:col-span-1">
+                <Label htmlFor="name" className="text-sm">Name (Optional)</Label>
                 <Input
                   id="name"
                   placeholder="John Doe"
                   value={newRecipient.name}
                   onChange={(e) => setNewRecipient(prev => ({ ...prev, name: e.target.value }))}
                   onKeyPress={handleKeyPress}
+                  className="text-sm sm:text-base"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="amount" className="flex items-center gap-2">
+              <div className="space-y-2 sm:col-span-3 md:col-span-1">
+                <Label htmlFor="amount" className="flex items-center gap-2 text-sm">
                   <DollarSign className="h-4 w-4" />
                   Amount (ETH)
                 </Label>
@@ -136,6 +137,7 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
                   value={newRecipient.amount}
                   onChange={(e) => setNewRecipient(prev => ({ ...prev, amount: e.target.value }))}
                   onKeyPress={handleKeyPress}
+                  className="text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -144,7 +146,7 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
               <Button
                 onClick={addRecipient}
                 disabled={!newRecipient.address.trim() || !newRecipient.amount.trim()}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2 text-sm sm:px-6 sm:py-3"
               >
                 <Plus className="h-4 w-4" />
                 Add Recipient
@@ -162,7 +164,7 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
                 {recipients.map((recipient, index) => (
                   <div
                     key={index}
-                    className={`flex items-center justify-between rounded-lg border p-4 ${
+                    className={`flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4 ${
                       recipient.isValid
                         ? 'border-border bg-card'
                         : 'border-destructive/50 bg-destructive/5'
@@ -170,18 +172,18 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
                           <User className="h-4 w-4 text-primary" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-foreground truncate">
+                          <p className="font-medium text-foreground truncate text-sm sm:text-base">
                             {recipient.name}
                           </p>
-                          <p className="text-sm text-muted-foreground font-mono truncate">
+                          <p className="text-xs text-muted-foreground font-mono truncate sm:text-sm">
                             {recipient.address}
                           </p>
                           {!recipient.isValid && recipient.error && (
-                            <p className="text-sm text-destructive mt-1">
+                            <p className="text-xs text-destructive mt-1 sm:text-sm">
                               {recipient.error}
                             </p>
                           )}
@@ -189,9 +191,9 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 ml-4">
-                      <div className="text-right">
-                        <p className="font-semibold text-foreground">
+                    <div className="flex items-center justify-between gap-4 sm:justify-end">
+                      <div className="text-left sm:text-right">
+                        <p className="font-semibold text-foreground text-sm sm:text-base">
                           {recipient.amount} ETH
                         </p>
                       </div>
@@ -200,7 +202,7 @@ export function ManualInput({ recipients, onRecipientsChange }: ManualInputProps
                         variant="ghost"
                         size="sm"
                         onClick={() => removeRecipient(index)}
-                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

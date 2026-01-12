@@ -118,7 +118,7 @@
 
 @layer components {
   .card-base {
-    @apply bg-card rounded-2xl border border-border p-6;
+    @apply bg-card rounded-xl border border-border p-4 shadow-sm sm:p-6;
     box-shadow: var(--shadow-card);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
   }
@@ -128,7 +128,7 @@
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground font-semibold rounded-xl px-6 py-3;
+    @apply bg-primary text-primary-foreground font-semibold rounded-lg px-4 py-2.5 text-sm sm:rounded-xl sm:px-6 sm:py-3;
     box-shadow: var(--shadow-button);
     transition: all 0.2s ease;
   }
@@ -144,7 +144,7 @@
   }
 
   .btn-secondary {
-    @apply bg-secondary text-secondary-foreground font-medium rounded-xl px-6 py-3 border border-border;
+    @apply bg-secondary text-secondary-foreground font-medium rounded-lg px-4 py-2.5 text-sm border border-border sm:rounded-xl sm:px-6 sm:py-3;
     transition: all 0.2s ease;
   }
 
@@ -158,11 +158,11 @@
   }
 
   .input-base {
-    @apply w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all;
+    @apply w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:px-4 sm:py-3 sm:text-base sm:rounded-xl;
   }
 
   .dropzone {
-    @apply border-2 border-dashed border-border rounded-2xl p-8 text-center cursor-pointer transition-all;
+    @apply border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer transition-all sm:rounded-2xl sm:p-8;
   }
 
   .dropzone:hover,
