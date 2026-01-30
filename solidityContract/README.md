@@ -201,18 +201,35 @@ forge test
 
 ### Test Coverage
 
-- Successful batch payments
-- Fee calculation accuracy
-- Employee management operations
-- Input validation and error handling
-- Security edge cases
-- Reentrancy protection
+- **Unit Tests**: `test/BatchPay.t.sol` - Basic functionality and error handling (10 tests)
+- **Fuzz Tests**: `test/fuzz/BatchPayFuzz.t.sol` - Property-based testing with random inputs
+- **Integration Tests**: `test/integration/BatchPayIntegration.t.sol` - Complex multi-user scenarios
 
 ### Test Structure
 
-- `test/BatchPay.t.sol`: Main test suite with 10 test cases
-- Gas optimization tests
-- Fuzz testing for critical functions
+```
+test/
+├── BatchPay.t.sol              # Unit tests
+├── fuzz/
+│   └── BatchPayFuzz.t.sol      # Fuzz tests
+└── integration/
+    └── BatchPayIntegration.t.sol # Integration tests
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+forge test
+
+# Run specific test types
+forge test --match-path test/BatchPay.t.sol
+forge test --match-path test/fuzz/BatchPayFuzz.t.sol
+forge test --match-path test/integration/BatchPayIntegration.t.sol
+
+# Run with gas reporting
+forge test --gas-report
+```
 
 ## Deployment
 
