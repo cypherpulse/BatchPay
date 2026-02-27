@@ -297,3 +297,6 @@ Thumbs.db
 *.rar
 
 *.ps1
+mainnet.txt
+
+*.sh
